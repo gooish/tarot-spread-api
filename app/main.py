@@ -4,6 +4,13 @@ from random import shuffle, randint
 from PIL import Image
 from flask import send_from_directory
 from secrets import token_urlsafe
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read("server.cfg")
+
+server_url = config["GENERAL"]["server"]
+token = config["GENERAL"]["token"]
 
 # tarot logic goes here
 def get_reading(amount):
@@ -34,19 +41,20 @@ def make_image(reading):
 
         image_filename = "i/" + token_urlsafe(4) + ".jpg"
         reading_image.save("app/" + image_filename)
-        return("http://localhost:5000/" + image_filename)
+        return(server_url + image_filename)
 
 # main router
 app = Flask(__name__, static_url_path="")
 @app.route('/', methods=['GET', 'POST'])
 def form():
-    if request.method == 'POST':
+    if request.method == 'POST' and request.form.get("token") == token:
         try:
             amount = int(request.form.get("amount"))
             return get_reading(amount) + "\n"
         except ValueError:
             return "Not a number!\n"
-        
+    else:
+        return("Status OK")
 
 @app.route('/i/<path:path>')
 def serve_image(path):
