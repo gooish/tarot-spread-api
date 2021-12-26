@@ -50,9 +50,11 @@ def form():
     if request.method == 'POST' and request.form.get("token") == token:
         try:
             amount = int(request.form.get("amount"))
+            if amount < 1 or amount > 78:
+                return ":-D\n"
             return get_reading(amount) + "\n"
         except ValueError:
-            return "Not a number!\n"
+            return ":-D\n"
     else:
         return("Status OK")
 
