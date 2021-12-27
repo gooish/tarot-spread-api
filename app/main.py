@@ -1,10 +1,11 @@
 from flask import Flask, request
-from os import listdir
+from os import listdir, path
 from random import shuffle, randint
 from PIL import Image
 from flask import send_from_directory
 from secrets import token_urlsafe
 from configparser import ConfigParser
+import subprocess
 
 config = ConfigParser()
 config.read("server.cfg")
@@ -55,8 +56,11 @@ def form():
             return get_reading(amount) + "\n"
         except ValueError:
             return ":-D\n"
+
     else:
-        return("Status OK")
+        image_amount = len(listdir("app/i"))
+        images_disk_use = subprocess.check_output(['du','-sh', "app/i"]).split()[0].decode('utf-8')
+        return("Served {0} spreads so far, using {1} of disk".format(image_amount, images_disk_use))
 
 @app.route('/i/<path:path>')
 def serve_image(path):
