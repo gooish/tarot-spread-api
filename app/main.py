@@ -66,5 +66,9 @@ def form():
 def serve_image(path):
     return send_from_directory('i', path)
 
+@app.route('/metrics')
+def serve_metrics():
+    image_amount = len(listdir("app/i"))
+    return("\# HELP tarot_images_created Tarot images created\n\# TYPE tarot_images_created counter\ntarot_images_created " + image_amount + "\n")
 if __name__ == "__main__":
     app.run(debug=True)
