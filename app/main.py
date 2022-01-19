@@ -1,5 +1,5 @@
-from flask import Flask, request
-from os import listdir, path
+from flask import Flask, request, make_response
+from os import listdir
 from random import shuffle, randint
 from PIL import Image
 from flask import send_from_directory
@@ -69,6 +69,11 @@ def serve_image(path):
 @app.route('/metrics')
 def serve_metrics():
     image_amount = len(listdir("app/i"))
-    return("\# HELP tarot_images_created Tarot images created\n\# TYPE tarot_images_created counter\ntarot_images_created " + image_amount + "\n")
+    response = make_response("""# HELP tarot_images_created Tarot images created
+# TYPE tarot_images_created counter
+tarot_images_created """ + str(image_amount) + "\n", 200)
+    response.mimetype = "text/plain"
+    return response
+
 if __name__ == "__main__":
     app.run(debug=True)
